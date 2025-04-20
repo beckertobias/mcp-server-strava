@@ -1,5 +1,5 @@
 import express from 'express';
-import { stravaController } from '../controllers/strava.controller';
+import { stravaController } from '../controllers/strava.controller.js';
 
 const router = express.Router();
 

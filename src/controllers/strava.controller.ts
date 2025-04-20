@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { stravaService } from '../services/strava.service';
+import { stravaService } from '../services/strava.service.js';
 
 export const stravaController = {
   // Redirect user to Strava authorization

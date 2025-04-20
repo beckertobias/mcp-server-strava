@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { config } from '../config';
-import { StravaActivity, StravaTokenResponse, UserSession } from '../types/strava.types';
+import { config } from '../config/index.js';
+import { StravaActivity, StravaTokenResponse, UserSession } from '../types/strava.types.js';
 
 // In a real app, use a proper session store or database
 let userSession: UserSession | null = null;
@@ -22,13 +22,14 @@ export class StravaService {
         grant_type: 'authorization_code'
       });
 
-      userSession = {
+      const session = {
         accessToken: response.data.access_token,
         refreshToken: response.data.refresh_token,
         expiresAt: response.data.expires_at
       };
 
-      return userSession;
+      this.setSession(session);
+      return session;
     } catch (error) {
       console.error('Error exchanging code for tokens:', error);
       throw new Error('Failed to get access tokens');
@@ -52,11 +53,13 @@ export class StravaService {
           grant_type: 'refresh_token'
         });
 
-        userSession = {
+        const session = {
           accessToken: response.data.access_token,
           refreshToken: response.data.refresh_token,
           expiresAt: response.data.expires_at
         };
+        
+        this.setSession(session);
       } catch (error) {
         console.error('Error refreshing token:', error);
         throw new Error('Failed to refresh token');
@@ -93,7 +96,17 @@ export class StravaService {
 
   // Clear user session
   logout(): void {
-    userSession = null;
+    this.setSession(null);
+  }
+
+  // Set user session (used by MCP server for persistence)
+  setSession(session: UserSession | null): void {
+    userSession = session;
+  }
+
+  // Get current session (used by MCP server for persistence)
+  getSession(): UserSession | null {
+    return userSession;
   }
 }
 
